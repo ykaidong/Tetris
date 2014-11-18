@@ -48,7 +48,6 @@ typedef struct
     uint32_t out;           //!< 读偏移
 } fifo_t;
 
-
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
 //! 创建一个名字为 FIFO_NAME 队列并初始化
@@ -59,14 +58,19 @@ typedef struct
          FIFO_NAME##_buf, FIFO_BUF_SIZE, 0, 0}
 
 /* Exported functions ------------------------------------------------------- */
+// fifo 初始化
 extern void fifo_init(fifo_t *fifo);
+// 向fifo 写入指定长度的数据
 extern uint32_t fifo_put(fifo_t *fifo, uint8_t *buffer, uint32_t len);
+// 从fifo 读出指定长度的数据
 extern uint32_t fifo_get(fifo_t *fifo, uint8_t *buffer, uint32_t len);
+// 向fifo 写入一字节数据
 extern bool fifo_putc(fifo_t *fifo, uint8_t byte);
+// 从fifo 读出一字节数据
 extern bool fifo_getc(fifo_t *fifo, uint8_t *byte);
+
 extern bool fifo_is_empty(fifo_t *fifo);
 extern bool fifo_is_full(fifo_t *fifo);
-
 
 #endif
 /************* Copyright(C) 2013 - 2014 DevLabs **********END OF FILE**********/
