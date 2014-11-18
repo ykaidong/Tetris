@@ -2,22 +2,24 @@
 
 <project>
   <fileVersion>2</fileVersion>
-  <fileChecksum>3168530488</fileChecksum>
+  <fileChecksum>1829880296</fileChecksum>
   <configuration>
     <name>Debug</name>
     <outputs>
       <file>$PROJ_DIR$\..\main.c</file>
-      <file>$TOOLKIT_DIR$\inc\intrinsics.h</file>
+      <file>$PROJ_DIR$\..\fifo.c</file>
+      <file>$PROJ_DIR$\..\uart.c</file>
       <file>$PROJ_DIR$\main.c</file>
       <file>$PROJ_DIR$\Debug\Obj\main.pbi</file>
-      <file>$PROJ_DIR$\Debug\Exe\Tetris.d43</file>
+      <file>$PROJ_DIR$\Debug\Obj\main.r43</file>
       <file>$PROJ_DIR$\Debug\Exe\Tetris.ulp</file>
       <file>$PROJ_DIR$\Debug\Obj\Tetris.pbd</file>
-      <file>$PROJ_DIR$\Debug\Obj\main.r43</file>
       <file>$TOOLKIT_DIR$\lib\dlib\dl430fn.h</file>
-      <file>$TOOLKIT_DIR$\inc\dlib\c\stdint.h</file>
       <file>$TOOLKIT_DIR$\inc\dlib\c\yvals.h</file>
       <file>$TOOLKIT_DIR$\inc\dlib\c\xencoding_limits.h</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\c\stdint.h</file>
+      <file>$TOOLKIT_DIR$\inc\intrinsics.h</file>
+      <file>$PROJ_DIR$\Debug\Exe\Tetris.d43</file>
       <file>$TOOLKIT_DIR$\inc\dlib\c\DLib_Threads.h</file>
       <file>$TOOLKIT_DIR$\lib\dlib\dl430fn.r43</file>
       <file>$TOOLKIT_DIR$\inc\dlib\c\DLib_Product.h</file>
@@ -28,27 +30,81 @@
       <file>$TOOLKIT_DIR$\inc\dlib\c\ycheck.h</file>
       <file>$TOOLKIT_DIR$\inc\dlib\c\DLib_Defaults.h</file>
       <file>$TOOLKIT_DIR$\inc\in430.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\uart.r43</file>
+      <file>$PROJ_DIR$\Debug\Obj\fifo.r43</file>
+      <file>$PROJ_DIR$\..\fifo.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\uart.pbi</file>
+      <file>$PROJ_DIR$\..\uart.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\fifo.pbi</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\c\ysizet.h</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\c\string.h</file>
     </outputs>
     <file>
       <name>$PROJ_DIR$\..\main.c</name>
       <outputs>
         <tool>
           <name>BICOMP</name>
-          <file> 3</file>
+          <file> 4</file>
         </tool>
         <tool>
           <name>ICC430</name>
-          <file> 7</file>
+          <file> 5</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
           <name>BICOMP</name>
-          <file> 15 16 21 1 18 9 19 10 20 8 14 11 12</file>
+          <file> 17 18 23 12 20 11 21 9 22 8 16 10 14 28</file>
         </tool>
         <tool>
           <name>ICC430</name>
-          <file> 15 16 21 1 18 9 19 10 20 8 14 11 12</file>
+          <file> 17 18 23 12 20 11 21 9 22 8 16 10 14 28</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\fifo.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 29</file>
+        </tool>
+        <tool>
+          <name>ICC430</name>
+          <file> 25</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 31 21 9 22 8 16 10 14 30 26 11 20</file>
+        </tool>
+        <tool>
+          <name>ICC430</name>
+          <file> 31 21 9 22 8 16 10 14 30 26 11 20</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\uart.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 27</file>
+        </tool>
+        <tool>
+          <name>ICC430</name>
+          <file> 24</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 31 21 9 22 8 16 10 14 30 28 17 18 23 12 11 20 26</file>
+        </tool>
+        <tool>
+          <name>ICC430</name>
+          <file> 31 21 9 22 8 16 10 14 30 28 17 18 23 12 11 20 26</file>
         </tool>
       </inputs>
     </file>
@@ -57,17 +113,17 @@
       <outputs>
         <tool>
           <name>BICOMP</name>
-          <file> 3</file>
+          <file> 4</file>
         </tool>
         <tool>
           <name>ICC430</name>
-          <file> 7</file>
+          <file> 5</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
           <name>ICC430</name>
-          <file> 15 16 21 1 18 9 19 10 20 8 14 11 12</file>
+          <file> 17 18 23 12 20 11 21 9 22 8 16 10 14</file>
         </tool>
       </inputs>
     </file>
@@ -76,7 +132,7 @@
       <inputs>
         <tool>
           <name>XLINK</name>
-          <file> 17 7 13</file>
+          <file> 19 25 5 24 15</file>
         </tool>
       </inputs>
     </file>
@@ -85,11 +141,11 @@
       <outputs>
         <tool>
           <name>XLINK</name>
-          <file> 4</file>
+          <file> 13</file>
         </tool>
         <tool>
           <name>ULP430</name>
-          <file> 5</file>
+          <file> 6</file>
         </tool>
       </outputs>
     </file>

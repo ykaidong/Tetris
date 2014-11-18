@@ -36,6 +36,7 @@
 #include <MSP430.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include "uart.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -56,13 +57,21 @@ void timer_init(void);
 int main(void)
 {
     WDTCTL = WDTPW + WDTHOLD;
-    __bis_SR_register(GIE);         // 开全局中断
 
     LED_INIT();
     timer_init();
+    uart_init();
+
+    __bis_SR_register(GIE);         // 开全局中断
+
+    uart_puts("hello launchpad!\n");
 
     while (1)
     {
+        uint8_t i;
+        if (uart_getc(&i))
+            uart_putc(i);
+
         if (timer_count > 500)
         {
             timer_count = 0;
