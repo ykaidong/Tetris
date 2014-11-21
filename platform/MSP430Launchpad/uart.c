@@ -39,7 +39,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
-#define UART_TX_FIFO_SIZE       256
+#define UART_TX_FIFO_SIZE       32
 #define UART_RX_FIFO_SIZE       32
 
 /* Private macro -------------------------------------------------------------*/

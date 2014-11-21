@@ -37,6 +37,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "uart.h"
+#include "key.h"
+
+#include <stdio.h>
+#include <stdlib.h>
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -61,6 +65,7 @@ int main(void)
     LED_INIT();
     timer_init();
     uart_init();
+    key_init();
 
     __bis_SR_register(GIE);         // 开全局中断
 
@@ -68,9 +73,20 @@ int main(void)
 
     while (1)
     {
-        uint8_t i;
-        if (uart_getc(&i))
-            uart_putc(i);
+        key_t key = key_get();
+        if (key != key_null)
+        {
+            if (key == key_up)
+                uart_puts("key up\n");
+            else if (key == key_down)
+                uart_puts("key down\n");
+            else if (key == key_left)
+                uart_puts("key left\n");
+            else if (key == key_right)
+                uart_puts("key right\n");
+            else
+                uart_putc(key);
+        }
 
         if (timer_count > 500)
         {

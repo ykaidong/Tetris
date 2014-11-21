@@ -1954,6 +1954,9 @@
     <name>$PROJ_DIR$\..\fifo.c</name>
   </file>
   <file>
+    <name>$PROJ_DIR$\..\key.c</name>
+  </file>
+  <file>
     <name>$PROJ_DIR$\..\main.c</name>
   </file>
   <file>
