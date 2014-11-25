@@ -120,6 +120,8 @@ void ui_print_level(uint8_t level)
 
     i = wtoa(level, level_buf);
     term_save_cursor();
+    term_set_foreground(red);
+    term_set_background(UI_BG_COLOR);
     term_set_cursor(55, 13);
     if (i == 1)
         term_puts("0");
@@ -144,6 +146,8 @@ void ui_print_line(uint16_t line)
     uint8_t i, j;
 
     term_save_cursor();
+    term_set_foreground(red);
+    term_set_background(UI_BG_COLOR);
     term_set_cursor(54, 17);
     i = wtoa(line, lines_buf);
     // 前导0, 一共3位宽度
@@ -170,6 +174,8 @@ void ui_print_score(uint16_t score)
     uint8_t i, j;
 
     term_save_cursor();
+    term_set_foreground(red);
+    term_set_background(UI_BG_COLOR);
     term_set_cursor(53, 21);
     i = wtoa(score, score_buf);
     // 一共4位宽度, 输出前导0
@@ -196,7 +202,6 @@ static void draw_box(uint8_t x, uint8_t y, color_t color)
     term_set_background(color);
     term_set_cursor(x, y);
     term_puts("  ");
-    // term_set_background(UI_BG_COLOR);
 
     return;
 }
@@ -218,7 +223,6 @@ void ui_draw_box(uint8_t x, uint8_t y, bool box)
         c = MAP_BG_COLOR;
     // 一个box为两个字符宽度
     draw_box(x * 2 + MAP_START_COLUMN, y + MAP_START_ROW, c);
-    // term_set_background(UI_BG_COLOR);
 
     return;
 }
@@ -235,9 +239,10 @@ void ui_print_preview(uint16_t brick)
             bit = ((brick & (0x0001 << (15 - (y * 4 + x)))) >> (15 - (y * 4 + x)));
 
             if (bit)
-                draw_box(x * 2 + PREVIEW_START_COLUMN + 1, y + PREVIEW_START_ROW + 1, BLOCK_COLOR);
+                // 乘2是因为一个box占用两个字符宽度, 加2表示预览方块在预览区的偏移
+                draw_box(x * 2 + PREVIEW_START_COLUMN + 2, y + PREVIEW_START_ROW + 1, BLOCK_COLOR);
             else
-                draw_box(x * 2 + PREVIEW_START_COLUMN + 1, y + PREVIEW_START_ROW + 1, PREVIEW_BG_COLOR);
+                draw_box(x * 2 + PREVIEW_START_COLUMN + 2, y + PREVIEW_START_ROW + 1, PREVIEW_BG_COLOR);
         }
     }
 
@@ -253,6 +258,9 @@ void ui_print_preview(uint16_t brick)
  */
 void ui_print_game_over(void)
 {
+    term_set_background(black);
+    term_set_foreground(white);
+
     term_set_cursor(22, 11);
     term_puts("                ");
     term_set_cursor(22, 12);
@@ -271,6 +279,9 @@ void ui_print_game_over(void)
  */
 void ui_print_game_pause(void)
 {
+    term_set_background(black);
+    term_set_foreground(white);
+
     term_set_cursor(22, 10);
     term_puts("                ");
     term_set_cursor(22, 11);
@@ -287,6 +298,12 @@ void ui_print_game_pause(void)
 }
 
 
+void ui_reset_cursor(void)
+{
+    RESET_CURSOR();
+
+    return;
+}
 
 
 /**

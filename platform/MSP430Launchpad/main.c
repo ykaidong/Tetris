@@ -107,7 +107,9 @@ void get_preview_brick(uint16_t info)
  */
 uint8_t random_num(void)
 {
-    return 4;
+    // XXX
+    // 随机数产生, 直接读定时器值, 待改进
+    return (uint8_t)TAR % 7;
 }
 
 
@@ -217,6 +219,8 @@ void game_run(void)
         tetris_sync();
         // 更新行数, 分数等信息
         game_info_update();
+        ui_reset_cursor();
+        LED_TRIGGER();
     }
 
     return;
@@ -245,13 +249,10 @@ int main(void)
 
     __bis_SR_register(GIE);         // 开全局中断
 
-    uart_puts("hello, msp430 launchpad\n");
-
-game_start:
     ui_init();
     tetris_init(&ui_draw_box, &random_num, &get_preview_brick, &get_remove_line_num);
 
-    // game_pause();
+    game_pause();
 
     while (1)
     {
@@ -260,22 +261,16 @@ game_start:
             if (timer_count > 50)
             {
                 timer_count = 0;
-                LED_TRIGGER();
                 game_run();
             }
         }
         else
         {
-            key_t key = key_get();
-            if (key == key_enter)
-                goto game_start;
+            // XXX
+            game_over();
+            __bis_SR_register(LPM0_bits);       // Enter LPM0
+            while (1);
         }
-
-        // if (timer_count > 500)
-        // {
-        //     timer_count = 0;
-        //     LED_TRIGGER();
-        // }
 
         __bis_SR_register(LPM0_bits);       // Enter LPM0
     }

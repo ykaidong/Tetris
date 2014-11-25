@@ -52,6 +52,7 @@ extern void ui_print_line(uint16_t line);
 extern void ui_print_score(uint16_t score);
 extern void ui_print_game_over(void);
 extern void ui_print_game_pause(void);
+extern void ui_reset_cursor(void);
 
 #endif
 /************* Copyright(C) 2013 - 2014 DevLabs **********END OF FILE**********/

@@ -189,6 +189,9 @@ void term_puts(const char *str)
 {
     while (*str != '\0')
     {
+        // XXX
+        // 此处使用等待的方式发送, 数据量大时可能会在此处卡顿
+        // 待改进
         while (!TERM_PUTC(*str));
         str++;
     }

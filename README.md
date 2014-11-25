@@ -8,6 +8,15 @@ Tetris
 ![Tetris](./Tetris.gif)
 
 ---
+
+MSP430 Launchpad + PuTTY(超级终端也可, 波特率115200, MCU工作于16MHz):
+
+![Tetris](./Tetris_msp430.gif)
+
+注:msp430分支尚未合并到master分支, 可在对应的分支下查看源代码.
+
+---
+
 此模块之前是运行于8051系列微处理器上的, 所以内存占用很小, 不支持彩色.
 
 游戏运行的相关逻辑如新方块产生, 地图维护, 边界检测等全部都被封装在模块内部, 
@@ -98,4 +107,9 @@ typedef enum
 在platfrom/windows下是在Windows控制台下实现的代码, 供参考.
 如果安装了GCC, 运行builder.bat可直接编译.
 如果使用IDE可以将所有的.c文件和.h文件放入一个文件夹添加进工程编译即可.
+
+--- 
+
+MSP430平台的代码使用IAR for msp430 v5.5 编译, 在文件夹IAR中是对应的工程文件,
+打开即可编译.
 
