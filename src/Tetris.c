@@ -216,7 +216,8 @@ void tetris_sync_all(void)
  */
 bool tetris_is_game_over(void)
 {
-    return is_game_over;
+    
+  return is_game_over;
 }
 
 /**

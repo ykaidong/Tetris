@@ -43,6 +43,8 @@
 typedef enum
 {
     key_null,
+    key_enter = 0x0D,   // enter
+    key_space = ' ',
     key_up = 160,       // 取ASCII范围外的值
     key_down,
     key_left,

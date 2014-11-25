@@ -217,8 +217,6 @@ void game_run(void)
 
 int main(void)
 {
-    setlocale(LC_CTYPE, "chs");
-
     // 随机数种子
     srand((int32_t)time(NULL));
 

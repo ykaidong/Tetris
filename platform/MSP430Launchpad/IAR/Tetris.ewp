@@ -317,7 +317,7 @@
         </option>
         <option>
           <name>newCCIncludePaths</name>
-          <state></state>
+          <state>../../src/</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -345,7 +345,7 @@
         </option>
         <option>
           <name>CCOptLevel</name>
-          <state>1</state>
+          <state>0</state>
         </option>
         <option>
           <name>CCOptStrategy</name>
@@ -354,7 +354,7 @@
         </option>
         <option>
           <name>CCOptLevelSlave</name>
-          <state>1</state>
+          <state>0</state>
         </option>
         <option>
           <name>CInput</name>
@@ -1960,7 +1960,16 @@
     <name>$PROJ_DIR$\..\main.c</name>
   </file>
   <file>
+    <name>$PROJ_DIR$\..\term.c</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\..\..\..\src\Tetris.c</name>
+  </file>
+  <file>
     <name>$PROJ_DIR$\..\uart.c</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\..\ui.c</name>
   </file>
 </project>
 

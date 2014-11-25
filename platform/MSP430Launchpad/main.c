@@ -36,11 +36,10 @@
 #include <MSP430.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include "tetris.h"
 #include "uart.h"
 #include "key.h"
-
-#include <stdio.h>
-#include <stdlib.h>
+#include "ui.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -54,13 +53,190 @@
 /* Private variables ---------------------------------------------------------*/
 static volatile uint16_t timer_count;
 
-/* Private function prototypes -----------------------------------------------*/
-void timer_init(void);
+static bool pause = false;          // 游戏暂停
+static uint8_t level = 1;           // 级别
+static uint16_t lines = 0;          // 消除的行数
+static uint16_t score = 0;          // 分数
+static uint16_t speed_count = 0;
 
+/* Private function prototypes -----------------------------------------------*/
+static void timer_init(void);
 /* Private functions ---------------------------------------------------------*/
+
+
+
+void game_over(void)
+{
+    ui_print_game_over();
+
+    return;
+}
+
+
+/**
+ * \brief  更新分数等
+ */
+void game_info_update(void)
+{
+    ui_print_level(level);
+    ui_print_line(lines);
+    ui_print_score(score);
+
+    return;
+}
+
+
+/**
+ * \brief  返回预览方块(下一个方块)的信息
+ *
+ * \param  info 16位整数, 从bit 15 开始
+ *         每四位为一组, 组成一个4*4的点阵
+ *         点阵中为1的位组成下一个方块的图形
+ */
+void get_preview_brick(uint16_t info)
+{
+    ui_print_preview(info);
+
+    return;
+}
+
+/**
+ * \brief  Tetris模块获得随机数的回调函数
+ *
+ * \return 产生的随机数
+ */
+uint8_t random_num(void)
+{
+    return 4;
+}
+
+
+/**
+ * \brief  Tetris返回消除行数的回调函数
+ *
+ * \param  line 消行数
+ */
+void get_remove_line_num(uint8_t line)
+{
+    lines += line;
+
+    switch (line)
+    {
+    case 1:
+        score += 10;
+        break;
+    case 2:
+        score += 25;
+        break;
+    case 3:
+        score += 45;
+        break;
+    case 4:
+        score += 80;
+        break;
+    default:
+        break;
+    }
+
+    // 每25行升一级
+    level = lines / 25 + 1;
+
+    return;
+}
+
+
+/**
+ * \brief  游戏暂停
+ */
+void game_pause(void)
+{
+    pause = !pause;
+
+    if (pause)
+        ui_print_game_pause();
+    else
+        tetris_sync_all();      // 因为打印暂停破坏了地图区显示
+                                // 所以退出时要刷新整个地图区
+    return;
+}
+
+
+void game_run(void)
+{
+    static bool refresh = false;
+
+    if (!pause)
+        speed_count++;
+
+    // 级别越高速度越快
+    if (speed_count >= (12 - level))
+    {
+        speed_count = 0;
+
+        refresh = true;
+        tetris_move(dire_down);
+    }
+
+    key_t key = key_get();
+    if (key != key_null)
+    {
+        // 暂停时只响应回车键
+        if (pause && key != key_enter)
+            return;
+
+        switch (key)
+        {
+        case key_up:
+            tetris_move(dire_rotate);
+            break;
+        case key_down:
+            tetris_move(dire_down);
+            break;
+        case key_left:
+            tetris_move(dire_left);
+            break;
+        case key_right:
+            tetris_move(dire_right);
+            break;
+        case key_space:
+            while (tetris_move(dire_down));
+            break;
+        case key_enter:
+            game_pause();
+            break;
+        default:
+            break;
+        }
+
+        refresh = true;
+    }
+
+    if (refresh)
+    {
+        refresh = !refresh;
+        tetris_sync();
+        // 更新行数, 分数等信息
+        game_info_update();
+    }
+
+    return;
+}
+
+
 int main(void)
 {
     WDTCTL = WDTPW + WDTHOLD;
+
+    if (CALBC1_1MHZ == 0xFF)                    // If calibration constant erased
+    {
+        while(1);                               // do not load, trap CPU!!
+    }
+    DCOCTL = 0;                                 // Select lowest DCOx and MODx settings
+    BCSCTL1 = CALBC1_1MHZ;                      // Set range
+    DCOCTL = CALDCO_1MHZ;                       // Set DCO step + modulation
+
+    // P1DIR |= BIT4;                              // P1.4输出SMCLK.
+    // P1SEL |= BIT4;
 
     LED_INIT();
     timer_init();
@@ -69,30 +245,37 @@ int main(void)
 
     __bis_SR_register(GIE);         // 开全局中断
 
-    uart_puts("hello launchpad!\n");
+    uart_puts("hello, msp430 launchpad\n");
+
+game_start:
+    ui_init();
+    tetris_init(&ui_draw_box, &random_num, &get_preview_brick, &get_remove_line_num);
+
+    // game_pause();
 
     while (1)
     {
-        key_t key = key_get();
-        if (key != key_null)
+        if (!tetris_is_game_over())
         {
-            if (key == key_up)
-                uart_puts("key up\n");
-            else if (key == key_down)
-                uart_puts("key down\n");
-            else if (key == key_left)
-                uart_puts("key left\n");
-            else if (key == key_right)
-                uart_puts("key right\n");
-            else
-                uart_putc(key);
+            if (timer_count > 50)
+            {
+                timer_count = 0;
+                LED_TRIGGER();
+                game_run();
+            }
+        }
+        else
+        {
+            key_t key = key_get();
+            if (key == key_enter)
+                goto game_start;
         }
 
-        if (timer_count > 500)
-        {
-            timer_count = 0;
-            LED_TRIGGER();
-        }
+        // if (timer_count > 500)
+        // {
+        //     timer_count = 0;
+        //     LED_TRIGGER();
+        // }
 
         __bis_SR_register(LPM0_bits);       // Enter LPM0
     }
@@ -103,7 +286,7 @@ int main(void)
 
 void timer_init(void)
 {
-    TACCR0 = 1000;                          // 1ms@1MHz
+    TACCR0 = 1000;
     TACTL |= TASSEL_2 + MC_1;               // SMCLK, up mode->counts up to TACCR0
     TACTL |= TAIE;                          // Enable interrupt
 

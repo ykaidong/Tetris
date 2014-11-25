@@ -1,14 +1,14 @@
 /**
   ******************************************************************************
-  * @file    ui.h
+  * @file    term.h
   * @author  ykaidong (http://www.DevLabs.cn)
   * @version V0.1
-  * @date    2014-11-15
+  * @date    2014-11-22
   * @brief
   ******************************************************************************
   * Change Logs:
   * Date           Author       Notes
-  * 2014-11-15     ykaidong     the first version
+  * 2014-11-22     ykaidong     the first version
   *
   ******************************************************************************
   * @attention
@@ -33,27 +33,47 @@
   */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef _UI_H_
-#define _UI_H_
+#ifndef _TERM_H_
+#define _TERM_H_
 /* Includes ------------------------------------------------------------------*/
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
 #include <stdbool.h>
-#include "pcc32.h"
+#include <stdint.h>
+#include "uart.h"
 
 /* Exported types ------------------------------------------------------------*/
+typedef enum
+{
+    black = 0,
+    red,
+    green,
+    yellow,
+    blue,
+    magenta,
+    cyan,
+    white,
+    defaults,
+} color_t;
+
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
-extern void ui_init(void);
-extern void ui_draw_box(uint8_t x, uint8_t y, bool box);
-extern void ui_print_preview(uint16_t block);
-extern void ui_print_level(uint8_t level);
-extern void ui_print_line(uint16_t line);
-extern void ui_print_score(uint32_t score);
-extern void ui_print_game_over(void);
-extern void ui_print_game_pause(void);
+
+extern void term_init(color_t foreground, color_t background);
+// clear screen
+extern void term_cls(void);
+// extern void term_puts(color_t color, uint8_t *str);
+extern void term_puts(uint8_t *str);
+// save current cursor position
+extern void term_save_cursor(void);
+// restore cursor position after a Save Cursor
+extern void term_restore_cursor(void);
+// set cursor position
+extern void term_set_cursor(uint8_t column, uint8_t row);
+// set foreground color
+extern void term_set_foreground(color_t color);
+// set background color
+extern void term_set_background(color_t color);
+
 
 #endif
 /************* Copyright(C) 2013 - 2014 DevLabs **********END OF FILE**********/

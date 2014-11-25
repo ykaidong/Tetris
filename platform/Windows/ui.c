@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file    ui.c
   * @author  ykaidong (http://www.DevLabs.cn)
-  * @version V0.1
+  * @version V0.2
   * @date    2014-11-15
   * @brief   俄罗斯方块界面相关函数.
   * @note    俄罗斯方块的基本元素是一组由4个小型正方形组成的规则图形，
@@ -16,7 +16,7 @@
   * Change Logs:
   * Date           Author       Notes
   * 2014-11-15     ykaidong     the first version
-  *
+  * 2014-11-23     ykaidong     将画box的函数独立出来
   ******************************************************************************
   * @attention
   *
@@ -43,8 +43,14 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
-#define     MAP_WIDTH           10      //!< 地图宽 10 个box
-#define     MAP_HEIGHT          20      //!< 地图高 20 个box
+#define     MAP_WIDTH               10      //!< 地图宽 10 个box
+#define     MAP_HEIGHT              20      //!< 地图高 20 个box
+
+#define     MAP_START_COLUMN        2
+#define     MAP_START_ROW           1
+
+#define     PREVIEW_START_COLUMN    28
+#define     PREVIEW_START_ROW       3
 
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
@@ -52,7 +58,27 @@
 /* Private functions ---------------------------------------------------------*/
 
 /**
- * \brief 在地图区域或预览区域画一个box
+ * \brief  在窗体上画一个box, 左上角坐标为(0, 0)
+ *
+ * \param  x
+ * \param  y
+ * \param  box true 画box, false 清除box
+ */
+static void draw_box(uint8_t x, uint8_t y, bool box)
+{
+    gotoTextPos(x, y);
+
+    if (!box)
+        printf("□");
+    else
+        printf("■");
+
+    return;
+}
+
+
+/**
+ * \brief 在地图区域画一个box
  *
  * \param  x 地图区: 0 - 9
  * \param  y 地图区: 0 - 19
@@ -60,12 +86,7 @@
 void ui_draw_box(uint8_t x, uint8_t y, bool box)
 {
     // 横向全角的一个方块符号占用两个字符位置
-    gotoTextPos(x * 2 + 2, y + 1);
-
-    if (!box)
-        printf("□");
-    else
-        printf("■");
+    draw_box(x * 2 + MAP_START_COLUMN, y + MAP_START_ROW, box);
 
     return;
 }
@@ -105,7 +126,7 @@ void ui_print_level(uint8_t level)
  *
  * \param  line
  */
-void ui_print_line(uint8_t line)
+void ui_print_line(uint16_t line)
 {
     gotoTextPos(33, 13);
     printf("%4d", line);
@@ -145,7 +166,8 @@ void ui_print_preview(uint16_t brick)
         for (x = 0; x < 4; x++)
         {
             bit = ((brick & (0x0001 << (15 - (y * 4 + x)))) >> (15 - (y * 4 + x)));
-            ui_draw_box(x + 13, y + 2, bit);
+            // 横向全角的一个方块符号占用两个字符位置
+            draw_box(x * 2 + PREVIEW_START_COLUMN, y + PREVIEW_START_ROW, bit);
         }
     }
 
