@@ -227,13 +227,13 @@ int main(void)
 {
     WDTCTL = WDTPW + WDTHOLD;
 
-    if (CALBC1_1MHZ == 0xFF)                    // If calibration constant erased
+    if (CALBC1_16MHZ == 0xFF)                   // If calibration constant erased
     {
         while(1);                               // do not load, trap CPU!!
     }
     DCOCTL = 0;                                 // Select lowest DCOx and MODx settings
-    BCSCTL1 = CALBC1_1MHZ;                      // Set range
-    DCOCTL = CALDCO_1MHZ;                       // Set DCO step + modulation
+    BCSCTL1 = CALBC1_16MHZ;                     // Set range
+    DCOCTL = CALDCO_16MHZ;                      // Set DCO step + modulation
 
     // P1DIR |= BIT4;                              // P1.4输出SMCLK.
     // P1SEL |= BIT4;
@@ -286,7 +286,7 @@ game_start:
 
 void timer_init(void)
 {
-    TACCR0 = 1000;
+    TACCR0 = 16000;
     TACTL |= TASSEL_2 + MC_1;               // SMCLK, up mode->counts up to TACCR0
     TACTL |= TAIE;                          // Enable interrupt
 

@@ -73,9 +73,9 @@
  *
  * \return 转换后的字符串长度
  */
-static uint8_t wtoa(uint16_t num, uint8_t *buf)
+static uint8_t wtoa(uint16_t num, char *buf)
 {
-    uint8_t *p = buf;
+    char *p = buf;
     uint8_t tmp, len = 0;
 
     // 转换为ASCII
@@ -115,7 +115,7 @@ static uint8_t wtoa(uint16_t num, uint8_t *buf)
  */
 void ui_print_level(uint8_t level)
 {
-    uint8_t level_buf[4];
+    char level_buf[4];
     uint8_t i;
 
     i = wtoa(level, level_buf);
@@ -124,7 +124,8 @@ void ui_print_level(uint8_t level)
     if (i == 1)
         term_puts("0");
 
-    term_puts(level_buf);
+    // 消除警告
+    term_puts((const char *)level_buf);
     term_restore_cursor();
 
     return;
@@ -139,7 +140,7 @@ void ui_print_level(uint8_t level)
  */
 void ui_print_line(uint16_t line)
 {
-    uint8_t lines_buf[6];
+    char lines_buf[6];
     uint8_t i, j;
 
     term_save_cursor();
@@ -149,7 +150,7 @@ void ui_print_line(uint16_t line)
     for (j = 0; j < 3 - i; j++)
         term_puts("0");
 
-    term_puts(lines_buf);
+    term_puts((const char *)lines_buf);
     term_restore_cursor();
 
     return;
@@ -165,7 +166,7 @@ void ui_print_line(uint16_t line)
  */
 void ui_print_score(uint16_t score)
 {
-    uint8_t score_buf[6];
+    char score_buf[6];
     uint8_t i, j;
 
     term_save_cursor();
@@ -175,7 +176,7 @@ void ui_print_score(uint16_t score)
     for (j = 0; j < 4 - i; j++)
         term_puts("0");
 
-    term_puts(score_buf);
+    term_puts((const char *)score_buf);
     term_restore_cursor();
 
     return;

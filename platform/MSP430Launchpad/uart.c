@@ -39,7 +39,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
-#define UART_TX_FIFO_SIZE       256
+#define UART_TX_FIFO_SIZE       128
 #define UART_RX_FIFO_SIZE       32
 
 /* Private macro -------------------------------------------------------------*/
@@ -61,9 +61,15 @@ void uart_init(void)
 
     UCA0CTL1 |= UCSSEL_2;                   // SMCLK
 
-    UCA0BR0 = 8;
+    // 115200@1MHz
+    // UCA0BR0 = 8;
+    // UCA0BR1 = 0;
+    // UCA0MCTL |= UCBRS_6;
+
+    // 115200@16MHz
+    UCA0BR0 = 138;
     UCA0BR1 = 0;
-    UCA0MCTL |= UCBRS_6;
+    UCA0MCTL |= UCBRS_7;
 
     UCA0CTL1 &= ~UCSWRST;                   // **Initialize USCI state machine**
     IE2 |= UCA0RXIE;                        // Enable USCI_A0 RX interrupt
