@@ -61,8 +61,8 @@ typedef enum
 extern void term_init(color_t foreground, color_t background);
 // clear screen
 extern void term_cls(void);
-// extern void term_puts(color_t color, uint8_t *str);
-extern void term_puts(uint8_t *str);
+// put string
+extern void term_puts(const char *str);
 // save current cursor position
 extern void term_save_cursor(void);
 // restore cursor position after a Save Cursor

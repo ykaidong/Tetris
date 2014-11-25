@@ -33,17 +33,37 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
+#include <string.h>             // strcpy()
 #include "term.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
-#define     ESC                 0x1B
 /* Private macro -------------------------------------------------------------*/
 #define     TERM_PUTC(c)        uart_putc(c)
+
+#define     RESET               0
+#define     CLEAR               1
+#define     SAVE_CURSOR         2
+#define     RESTORE_CURSOR      3
+#define     SET_FG_COLOR        4
+#define     SET_BG_COLOR        5
+#define     SET_COUSOR_POS      6
 
 /* Private variables ---------------------------------------------------------*/
 // foreground and background, default bg = black, fg = white
 static color_t color_fg = white, color_bg = black;
+
+static const char *ctrl_set[] =
+{
+    "\033c",        // <ESC>c, reset
+    "\033[2J",      // clear screen
+    "\033[s",       // save cursor postion
+    "\033[u",       // restore cursor
+    "\033[1;37m",   // foreground, bright white, 3x
+    "\033[1;40m",   // background, bright black, 4x
+    "\033[01;01H",  // cursor, x: 01, y:01
+                    // the position of home is (1, 1)
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
@@ -54,8 +74,7 @@ static color_t color_fg = white, color_bg = black;
 void term_reset(void)
 {
     // reset, command: <ESC>c
-    TERM_PUTC(ESC);
-    TERM_PUTC('c');
+    term_puts(ctrl_set[RESET]);
 
     return;
 }
@@ -66,10 +85,7 @@ void term_reset(void)
  */
 void term_cls(void)
 {
-    TERM_PUTC(ESC);
-    TERM_PUTC('[');
-    TERM_PUTC('2');
-    TERM_PUTC('J');
+    term_puts(ctrl_set[CLEAR]);
 
     return;
 }
@@ -90,20 +106,8 @@ void term_init(color_t foreground, color_t background)
     }
 
     term_reset();
-
-    // Set background and foreground
-    // command: <ESC>[{attr1};...;{attrn}m
-    TERM_PUTC(ESC);
-    TERM_PUTC('[');
-    TERM_PUTC('1');     // Bright color
-    TERM_PUTC(';');
-    TERM_PUTC('3');     // foreground, 3x
-    TERM_PUTC(color_fg % 10 + '0');
-    TERM_PUTC(';');
-    TERM_PUTC('4');
-    TERM_PUTC(color_bg % 10 + '0');
-    TERM_PUTC('m');
-
+    term_set_foreground(color_fg);
+    term_set_background(color_bg);
     term_cls();
 
     return;
@@ -118,16 +122,15 @@ void term_init(color_t foreground, color_t background)
  */
 void term_set_cursor(uint8_t column, uint8_t row)
 {
-    // command: <ESC>[{row};{column}H
-    // the position of home is (1, 1)
-    TERM_PUTC(ESC);
-    TERM_PUTC('[');
-    TERM_PUTC(row / 10 % 10 + '0');
-    TERM_PUTC(row % 10 + '0');
-    TERM_PUTC(';');
-    TERM_PUTC(column / 10 % 10 + '0');
-    TERM_PUTC(column % 10 + '0');
-    TERM_PUTC('H');
+    char buffer[9];
+
+    // <ESC>[01;01H
+    strcpy(buffer, ctrl_set[SET_COUSOR_POS]);
+    buffer[2] = (row / 10 % 10 + '0');
+    buffer[3] = (row % 10 + '0');
+    buffer[5] = (column / 10 % 10 + '0');
+    buffer[6] = (column % 10 + '0');
+    term_puts((const char *)buffer);
 
     return;
 }
@@ -142,14 +145,16 @@ void term_set_cursor(uint8_t column, uint8_t row)
  */
 void term_set_foreground(color_t color)
 {
+    char buffer[8];
+
     if (color != defaults)
     {
-        // foreground: 3x
-        TERM_PUTC(ESC);
-        TERM_PUTC('[');
-        TERM_PUTC('3');
-        TERM_PUTC(color % 10 + '0');
-        TERM_PUTC('m');
+        strcpy(buffer, ctrl_set[SET_FG_COLOR]);
+        // <ESC>[1;37m
+        //          ^
+        //         color
+        buffer[5] = (uint8_t)color % 10 + '0';
+        term_puts((const char *)buffer);
     }
 
     return;
@@ -162,14 +167,13 @@ void term_set_foreground(color_t color)
  */
 void term_set_background(color_t color)
 {
+    char buffer[8];
+
     if (color != defaults)
     {
-        // background: 4x
-        TERM_PUTC(ESC);
-        TERM_PUTC('[');
-        TERM_PUTC('4');
-        TERM_PUTC(color % 10 + '0');
-        TERM_PUTC('m');
+        strcpy(buffer, ctrl_set[SET_BG_COLOR]);
+        buffer[5] = (uint8_t)color % 10 + '0';
+        term_puts((const char *)buffer);
     }
 
     return;
@@ -181,7 +185,7 @@ void term_set_background(color_t color)
  * \param  color color for string
  * \param  str
  */
-void term_puts(uint8_t *str)
+void term_puts(const char *str)
 {
     while (*str != '\0')
     {
@@ -198,9 +202,7 @@ void term_puts(uint8_t *str)
  */
 void term_save_cursor(void)
 {
-    TERM_PUTC(ESC);
-    TERM_PUTC('[');
-    TERM_PUTC('s');
+    term_puts(ctrl_set[SAVE_CURSOR]);
 
     return;
 }
@@ -211,9 +213,7 @@ void term_save_cursor(void)
  */
 void term_restore_cursor(void)
 {
-    TERM_PUTC(ESC);
-    TERM_PUTC('[');
-    TERM_PUTC('u');
+    term_puts(ctrl_set[RESTORE_CURSOR]);
 
     return;
 }
