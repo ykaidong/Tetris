@@ -1,14 +1,14 @@
 /**
   ******************************************************************************
-  * @file    ui.h
+  * @file    uart.h
   * @author  ykaidong (http://www.DevLabs.cn)
   * @version V0.1
-  * @date    2014-11-15
-  * @brief
+  * @date    2014-11-18
+  * @brief   msp430 launchpad uart驱动
   ******************************************************************************
   * Change Logs:
   * Date           Author       Notes
-  * 2014-11-15     ykaidong     the first version
+  * 2014-11-18     ykaidong     the first version
   *
   ******************************************************************************
   * @attention
@@ -33,27 +33,21 @@
   */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef _UI_H_
-#define _UI_H_
+#ifndef _UART_H_
+#define _UART_H_
 /* Includes ------------------------------------------------------------------*/
-#include <stdio.h>
-#include <stdlib.h>
+#include <msp430.h>
 #include <stdint.h>
 #include <stdbool.h>
-#include "pcc32.h"
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
-extern void ui_init(void);
-extern void ui_draw_box(uint8_t x, uint8_t y, bool box);
-extern void ui_print_preview(uint16_t block);
-extern void ui_print_level(uint8_t level);
-extern void ui_print_line(uint16_t line);
-extern void ui_print_score(uint32_t score);
-extern void ui_print_game_over(void);
-extern void ui_print_game_pause(void);
+extern void uart_init(void);        // 115200, n, 8, 1
+extern uint8_t uart_puts(uint8_t *str);
+extern bool uart_putc(char ch);
+extern bool uart_getc(uint8_t *byte);
 
 #endif
 /************* Copyright(C) 2013 - 2014 DevLabs **********END OF FILE**********/

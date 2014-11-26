@@ -3,12 +3,12 @@
   * @file    main.c
   * @author  ykaidong (http://www.DevLabs.cn)
   * @version V0.1
-  * @date    2014-11-15
+  * @date    2014-11-17
   * @brief
   ******************************************************************************
   * Change Logs:
   * Date           Author       Notes
-  * 2014-11-15     ykaidong     the first version
+  * 2014-11-17     ykaidong     the first version
   *
   ******************************************************************************
   * @attention
@@ -33,24 +33,37 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include <stdlib.h>
-#include <time.h>
-#include <locale.h>
+#include <MSP430.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include "tetris.h"
+#include "uart.h"
+#include "key.h"
 #include "ui.h"
-#include "Tetris.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
+#define LED_INIT()          do {P1DIR |= BIT0; P1OUT &= ~BIT0;} while (0)
+#define LED_ON()            do {P1OUT |= BIT0; } while (0)
+#define LED_OFF()           do {P1OUT &= ~BIT0;} while (0)
+#define LED_TRIGGER()       do {if(P1IN & 0x01) P1OUT &= ~BIT0;\
+                                else P1OUT |= BIT0;} while (0)
+
 /* Private variables ---------------------------------------------------------*/
+static volatile uint16_t timer_count;
+
 static bool pause = false;          // 游戏暂停
 static uint8_t level = 1;           // 级别
 static uint16_t lines = 0;          // 消除的行数
 static uint16_t score = 0;          // 分数
-static uint16_t time_count = 0;
+static uint16_t speed_count = 0;
 
 /* Private function prototypes -----------------------------------------------*/
+static void timer_init(void);
 /* Private functions ---------------------------------------------------------*/
+
+
 
 void game_over(void)
 {
@@ -94,7 +107,9 @@ void get_preview_brick(uint16_t info)
  */
 uint8_t random_num(void)
 {
-    return (uint8_t)rand();
+    // XXX
+    // 随机数产生, 直接读定时器值, 待改进
+    return (uint8_t)TAR % 7;
 }
 
 
@@ -150,49 +165,45 @@ void game_pause(void)
 
 void game_run(void)
 {
-    uint16_t key;
     static bool refresh = false;
 
-    delayMS(50);
-
     if (!pause)
-        time_count++;
+        speed_count++;
 
     // 级别越高速度越快
-    if (time_count >= (12 - level))
+    if (speed_count >= (12 - level))
     {
-        time_count = 0;
+        speed_count = 0;
 
         refresh = true;
         tetris_move(dire_down);
     }
 
-    if (kbhit())
+    key_t key = key_get();
+    if (key != key_null)
     {
-        key = jkGetKey();
-
         // 暂停时只响应回车键
-        if (pause && key != JK_ENTER)
+        if (pause && key != key_enter)
             return;
 
         switch (key)
         {
-        case JK_UP:
+        case key_up:
             tetris_move(dire_rotate);
             break;
-        case JK_DOWN:
+        case key_down:
             tetris_move(dire_down);
             break;
-        case JK_LEFT:
+        case key_left:
             tetris_move(dire_left);
             break;
-        case JK_RIGHT:
+        case key_right:
             tetris_move(dire_right);
             break;
-        case JK_SPACE:
+        case key_space:
             while (tetris_move(dire_down));
             break;
-        case JK_ENTER:
+        case key_enter:
             game_pause();
             break;
         default:
@@ -200,7 +211,6 @@ void game_run(void)
         }
 
         refresh = true;
-        fflush(stdin);
     }
 
     if (refresh)
@@ -209,6 +219,8 @@ void game_run(void)
         tetris_sync();
         // 更新行数, 分数等信息
         game_info_update();
+        ui_reset_cursor();
+        LED_TRIGGER();
     }
 
     return;
@@ -217,25 +229,79 @@ void game_run(void)
 
 int main(void)
 {
-    // 随机数种子
-    srand((int32_t)time(NULL));
+    WDTCTL = WDTPW + WDTHOLD;
+
+    if (CALBC1_16MHZ == 0xFF)                   // If calibration constant erased
+    {
+        while(1);                               // do not load, trap CPU!!
+    }
+    DCOCTL = 0;                                 // Select lowest DCOx and MODx settings
+    BCSCTL1 = CALBC1_16MHZ;                     // Set range
+    DCOCTL = CALDCO_16MHZ;                      // Set DCO step + modulation
+
+    // P1DIR |= BIT4;                              // P1.4输出SMCLK.
+    // P1SEL |= BIT4;
+
+    LED_INIT();
+    timer_init();
+    uart_init();
+    key_init();
+
+    __bis_SR_register(GIE);         // 开全局中断
 
     ui_init();
     tetris_init(&ui_draw_box, &random_num, &get_preview_brick, &get_remove_line_num);
 
     game_pause();
 
-    while (!tetris_is_game_over())
+    while (1)
     {
-        game_run();
+        if (!tetris_is_game_over())
+        {
+            if (timer_count > 50)
+            {
+                timer_count = 0;
+                game_run();
+            }
+        }
+        else
+        {
+            // XXX
+            game_over();
+            __bis_SR_register(LPM0_bits);       // Enter LPM0
+            while (1);
+        }
+
+        __bis_SR_register(LPM0_bits);       // Enter LPM0
+    }
+    // return 0;
+}
+
+
+
+void timer_init(void)
+{
+    TACCR0 = 16000;
+    TACTL |= TASSEL_2 + MC_1;               // SMCLK, up mode->counts up to TACCR0
+    TACTL |= TAIE;                          // Enable interrupt
+
+    return;
+}
+
+
+#pragma vector=TIMER0_A1_VECTOR
+__interrupt void Timer_A(void)
+{
+    switch(TA0IV)
+    {
+    case 2: break;              // CCR1 not used
+    case 4: break;              // CCR2 not used
+    case 10:                    // overflow
+        timer_count++;
+        break;
     }
 
-    game_over();
-
-    // 按回车退出
-    while (getch() != 13);
-
-    return 0;
+    LPM0_EXIT;                  // exit low power mode
 }
 
 

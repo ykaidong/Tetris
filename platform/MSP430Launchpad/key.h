@@ -1,14 +1,14 @@
 /**
   ******************************************************************************
-  * @file    ui.h
+  * @file    key.h
   * @author  ykaidong (http://www.DevLabs.cn)
   * @version V0.1
-  * @date    2014-11-15
+  * @date    2014-11-18
   * @brief
   ******************************************************************************
   * Change Logs:
   * Date           Author       Notes
-  * 2014-11-15     ykaidong     the first version
+  * 2014-11-18     ykaidong     the first version
   *
   ******************************************************************************
   * @attention
@@ -33,27 +33,29 @@
   */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef _UI_H_
-#define _UI_H_
+#ifndef _KEY_H_
+#define _KEY_H_
 /* Includes ------------------------------------------------------------------*/
-#include <stdio.h>
-#include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
-#include "pcc32.h"
 
 /* Exported types ------------------------------------------------------------*/
+typedef enum
+{
+    key_null,
+    key_enter = 0x0D,   // enter
+    key_space = ' ',
+    key_up = 160,       // 取ASCII范围外的值
+    key_down,
+    key_left,
+    key_right,
+} key_t;
+
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
-extern void ui_init(void);
-extern void ui_draw_box(uint8_t x, uint8_t y, bool box);
-extern void ui_print_preview(uint16_t block);
-extern void ui_print_level(uint8_t level);
-extern void ui_print_line(uint16_t line);
-extern void ui_print_score(uint32_t score);
-extern void ui_print_game_over(void);
-extern void ui_print_game_pause(void);
+extern void key_init(void);
+extern key_t key_get(void);
 
 #endif
 /************* Copyright(C) 2013 - 2014 DevLabs **********END OF FILE**********/

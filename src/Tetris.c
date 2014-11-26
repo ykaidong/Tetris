@@ -40,7 +40,7 @@ typedef struct
 {
     int8_t x;               //!< brick在地图中的x坐标
     int8_t y;               //!< brick在地图中的y坐标
-    int8_t index;           //!< 方块索引, 高8位记录类型, 低8位记录变形
+    int8_t index;           //!< 方块索引, 高4位记录类型, 低4位记录变形
     uint16_t brick;         //!< 方块数据
 } brick_t;
 

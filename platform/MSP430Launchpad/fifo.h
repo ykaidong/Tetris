@@ -1,14 +1,14 @@
 /**
   ******************************************************************************
-  * @file    ui.h
+  * @file    fifo.h
   * @author  ykaidong (http://www.DevLabs.cn)
   * @version V0.1
-  * @date    2014-11-15
+  * @date    2014-11-18
   * @brief
   ******************************************************************************
   * Change Logs:
   * Date           Author       Notes
-  * 2014-11-15     ykaidong     the first version
+  * 2014-11-18     ykaidong     the first version
   *
   ******************************************************************************
   * @attention
@@ -33,27 +33,44 @@
   */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef _UI_H_
-#define _UI_H_
+#ifndef _FIFO_H_
+#define _FIFO_H_
 /* Includes ------------------------------------------------------------------*/
-#include <stdio.h>
-#include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
-#include "pcc32.h"
 
 /* Exported types ------------------------------------------------------------*/
+typedef struct
+{
+    uint8_t *buffer;        //!< 缓冲区指针
+    uint32_t size;          //!< 缓冲区大小
+    uint32_t in;            //!< 写偏移
+    uint32_t out;           //!< 读偏移
+} fifo_t;
+
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
+//! 创建一个名字为 FIFO_NAME 队列并初始化
+//! 注意FIFO_BUF_SIZE 必须为2的整数次幂
+ #define     CREATE_FIFO(FIFO_NAME, FIFO_BUF_SIZE)       \
+     static uint8_t FIFO_NAME##_buf[FIFO_BUF_SIZE];      \
+     static fifo_t FIFO_NAME = {                         \
+         FIFO_NAME##_buf, FIFO_BUF_SIZE, 0, 0}
+
 /* Exported functions ------------------------------------------------------- */
-extern void ui_init(void);
-extern void ui_draw_box(uint8_t x, uint8_t y, bool box);
-extern void ui_print_preview(uint16_t block);
-extern void ui_print_level(uint8_t level);
-extern void ui_print_line(uint16_t line);
-extern void ui_print_score(uint32_t score);
-extern void ui_print_game_over(void);
-extern void ui_print_game_pause(void);
+// fifo 初始化
+extern void fifo_init(fifo_t *fifo);
+// 向fifo 写入指定长度的数据
+extern uint32_t fifo_put(fifo_t *fifo, uint8_t *buffer, uint32_t len);
+// 从fifo 读出指定长度的数据
+extern uint32_t fifo_get(fifo_t *fifo, uint8_t *buffer, uint32_t len);
+// 向fifo 写入一字节数据
+extern bool fifo_putc(fifo_t *fifo, uint8_t byte);
+// 从fifo 读出一字节数据
+extern bool fifo_getc(fifo_t *fifo, uint8_t *byte);
+
+extern bool fifo_is_empty(fifo_t *fifo);
+extern bool fifo_is_full(fifo_t *fifo);
 
 #endif
 /************* Copyright(C) 2013 - 2014 DevLabs **********END OF FILE**********/
