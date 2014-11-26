@@ -13,7 +13,9 @@ MSP430 Launchpad + PuTTY(超级终端也可, 波特率115200, MCU工作于16MHz):
 
 ![Tetris](./Tetris_msp430.gif)
 
-注:msp430分支尚未合并到master分支, 可在对应的分支下查看源代码.
+注1: msp430分支尚未合并到master分支, 可在对应的分支下查看源代码.
+
+**注2: 通迅波特率为115200, lanuchpad自带的USB串口波特率达不到的.**
 
 ---
 
