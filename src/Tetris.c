@@ -2,13 +2,14 @@
   ******************************************************************************
   * @file    Tetris.c
   * @author  ykaidong (http://www.DevLabs.cn)
-  * @version V0.1
+  * @version V0.2
   * @date    2014-11-15
   * @brief
   ******************************************************************************
   * Change Logs:
   * Date           Author       Notes
   * 2014-11-15     ykaidong     the first version
+  * 2014-11-27     ykaidon      更新接口
   *
   ******************************************************************************
   * @attention
@@ -51,10 +52,10 @@ typedef struct
 #define BRICK_HEIGHT                4   // 一个brick由4*4的box组成
 #define BRICK_WIDTH                 4
 
-#define TETRIS_MAP_WIDTH            10  // 地图宽
-#define TETRIS_MAP_HEIGHT           20  // 地图高
+#define MAP_WIDTH                   10  // 地图宽
+#define MAP_HEIGHT                  20  // 地图高
 
-#define BRICK_START_X               ((TETRIS_MAP_WIDTH / 2) - (BRICK_WIDTH / 2))
+#define BRICK_START_X               ((MAP_WIDTH / 2) - (BRICK_WIDTH / 2))
 
 #ifndef NULL
     #define NULL    ((void *)0)
@@ -68,11 +69,11 @@ typedef struct
 
 /* Private variables ---------------------------------------------------------*/
 // 回调函数指针, 用来在坐标(x, y)画一个brick
-static void (*draw_box)(uint8_t x, uint8_t y, bool box) = NULL;
+static void (*draw_box)(uint8_t x, uint8_t y, uint8_t color) = NULL;
 // 回调函数指针, 获取一个随机数
 static uint8_t (*get_random_num)(void) = NULL;
 // 回调函数指针, 返回下一个brick的信息
-static void (*return_next_brick_info)(uint16_t info) = NULL;
+static void (*return_next_brick_info)(const void *info) = NULL;
 // 回调函数指针, 当有消行时调用
 static void (*return_remove_line_num)(uint8_t line) = NULL;
 
@@ -127,9 +128,9 @@ static const int8_t brick_start_y[BRICK_TYPE] =
 
 // 地图数组
 // map[0]是地图的最上方
-static int16_t map[TETRIS_MAP_HEIGHT];
+static int16_t map[MAP_HEIGHT];
 // 地图备份, 保存上一次的数据, 解决屏幕闪烁问题
-static int16_t map_backup[TETRIS_MAP_HEIGHT];
+static int16_t map_backup[MAP_HEIGHT];
 
 static brick_t curr_brick;              // 当前方块
 static brick_t next_brick;              // 下一个方块
@@ -168,20 +169,20 @@ void tetris_sync(void)
 
     // 为了解决全图更新时屏幕闪烁的问题
     // 新增一个备份区, 每次只更新不一样的部分
-    for (y = 0; y < TETRIS_MAP_HEIGHT; y++)
+    for (y = 0; y < MAP_HEIGHT; y++)
     {
         // 只更新不一样的部分
         if (map[y] != map_backup[y])
         {
-            for (x = 0; x < TETRIS_MAP_WIDTH; x++)
+            for (x = 0; x < MAP_WIDTH; x++)
             {
                 if (GET_BIT(map[y], x) != GET_BIT(map_backup[y], x))
-                    draw_box(x, y, GET_BIT(map[y], x));
+                    draw_box(x, y, (uint8_t)GET_BIT(map[y], x));
             }
         }
     }
 
-    for (y = 0; y < TETRIS_MAP_HEIGHT; y++)
+    for (y = 0; y < MAP_HEIGHT; y++)
         map_backup[y] = map[y];
 
     return;
@@ -196,11 +197,11 @@ void tetris_sync_all(void)
 {
     uint8_t x, y;
 
-    for (y = 0; y < TETRIS_MAP_HEIGHT; y++)
+    for (y = 0; y < MAP_HEIGHT; y++)
     {
-        for (x = 0; x < TETRIS_MAP_WIDTH; x++)
+        for (x = 0; x < MAP_WIDTH; x++)
         {
-            draw_box(x, y, GET_BIT(map[y], x));
+            draw_box(x, y, (uint8_t)GET_BIT(map[y], x));
         }
     }
 
@@ -236,7 +237,7 @@ static void draw_brick(const brick_t brick)
             // 所以在这里检查数组(地图)边界是必须的, 但是只要检查上边界就可以
             // 因为如果要调用此函数时已经经过冲突检测, 所以其它条件必然符合
             if (brick.y + box_y >= 0
-                // && brick.y < TETRIS_MAP_HEIGHT
+                // && brick.y < MAP_HEIGHT
                 && GET_BIT(brick.brick, 15 - (box_y * BRICK_WIDTH + box_x)))
             {
                 SET_BIT(map[box_y + brick.y], box_x + brick.x);
@@ -265,7 +266,7 @@ static void clear_brick(const brick_t brick)
         {
             // 保证在地图区域内
             if (brick.y + box_y >= 0
-                // && brick.y < TETRIS_MAP_HEIGHT
+                // && brick.y < MAP_HEIGHT
                 && GET_BIT(brick.brick, 15 - (box_y * BRICK_WIDTH + box_x)))
             {
                 CLR_BIT(map[box_y + brick.y], box_x + brick.x);
@@ -302,16 +303,16 @@ static bool is_conflict(const brick_t dest)
                 // 只需要检查左右边界就可以了, 下边界也没必要检查, 因为肯定不会越界
                 if ((dest.y + box_y) < 0)
                 {
-                    exp = (((box_x + dest.x) > (TETRIS_MAP_WIDTH - 1))        // 右边界
+                    exp = (((box_x + dest.x) > (MAP_WIDTH - 1))        // 右边界
                         || ((box_x + dest.x) < 0));                           // 左边界
-                        // || ((box_y + dest.y) > (TETRIS_MAP_HEIGHT - 1)));  // 下边界
+                        // || ((box_y + dest.y) > (MAP_HEIGHT - 1)));  // 下边界
                 }
                 else
                 {
                     // 此时box在地图内, 检查下边界, 还要检测box在地图内是否有冲突
-                    exp = (((box_x + dest.x) > (TETRIS_MAP_WIDTH - 1))        // 右边界
+                    exp = (((box_x + dest.x) > (MAP_WIDTH - 1))        // 右边界
                         || ((box_x + dest.x) < 0)                             // 左边界
-                        || ((box_y + dest.y) > (TETRIS_MAP_HEIGHT - 1))    // 下边界
+                        || ((box_y + dest.y) > (MAP_HEIGHT - 1))    // 下边界
                         || (GET_BIT(map[box_y + dest.y], (box_x + dest.x))));// 地图内
                 }
                 if (exp)
@@ -332,9 +333,9 @@ static bool is_conflict(const brick_t dest)
  * \param  next_brick_info
  * \param  remove_line_num
  */
-void tetris_init(void (*draw_box_to_map)(uint8_t x, uint8_t y, bool box),
+void tetris_init(void (*draw_box_to_map)(uint8_t x, uint8_t y, uint8_t color),
                  uint8_t (*get_random)(void),
-                 void (*next_brick_info)(uint16_t info),
+                 void (*next_brick_info)(const void *info),
                  void (*remove_line_num)(uint8_t line))
 {
     uint8_t i;
@@ -346,7 +347,7 @@ void tetris_init(void (*draw_box_to_map)(uint8_t x, uint8_t y, bool box),
     is_game_over = false;
 
     // 初始化地图
-    for (i = 0; i < TETRIS_MAP_HEIGHT; i++)
+    for (i = 0; i < MAP_HEIGHT; i++)
         map[i] = 0;
 
     curr_brick = create_new_brick();
@@ -354,7 +355,7 @@ void tetris_init(void (*draw_box_to_map)(uint8_t x, uint8_t y, bool box),
 
     // 返回预览方块信息
     if (return_next_brick_info != NULL)
-        return_next_brick_info(preview_brick_table[next_brick.index >> 4]);
+        return_next_brick_info(&preview_brick_table[next_brick.index >> 4]);
 
     draw_brick(curr_brick);
     tetris_sync_all();
@@ -375,7 +376,7 @@ static void line_clear_check(void)
     // 消行, map[0]实际上是地图的顶端
     // 从顶端开始向下扫, 每遇到一行满的
     // 就以此开始替换
-    for (row = 0; row < TETRIS_MAP_HEIGHT; row++)
+    for (row = 0; row < MAP_HEIGHT; row++)
     {
         if (map[row] >= 0x3FF)
         {
@@ -471,7 +472,7 @@ bool tetris_move(dire_t direction)
             next_brick = create_new_brick();
             // 预览方块信息
             if (return_next_brick_info != NULL)
-                return_next_brick_info(preview_brick_table[next_brick.index >> 4]);
+                return_next_brick_info(&preview_brick_table[next_brick.index >> 4]);
         }
         is_move = false;
     }

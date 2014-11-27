@@ -2,14 +2,14 @@
   ******************************************************************************
   * @file    main.c
   * @author  ykaidong (http://www.DevLabs.cn)
-  * @version V0.1
+  * @version V0.2
   * @date    2014-11-17
   * @brief
   ******************************************************************************
   * Change Logs:
   * Date           Author       Notes
   * 2014-11-17     ykaidong     the first version
-  *
+  * 2014-11-27     ykaidong     更新tetris.h的接口后添加必要的代码
   ******************************************************************************
   * @attention
   *
@@ -93,12 +93,33 @@ void game_info_update(void)
  *         每四位为一组, 组成一个4*4的点阵
  *         点阵中为1的位组成下一个方块的图形
  */
-void get_preview_brick(uint16_t info)
+void get_preview_brick(const void *info)
 {
-    ui_print_preview(info);
+    uint16_t dat = *(uint16_t *)info;
+
+    ui_print_preview(dat);
 
     return;
 }
+
+
+/**
+ * \brief  在地图上画一个box
+ *
+ * \param  x
+ * \param  y
+ * \param  color 为0时清楚此坐标上的box
+ */
+void draw_box(uint8_t x, uint8_t y, uint8_t color)
+{
+    if (color == 0)
+        ui_draw_box(x, y, false);
+    else
+        ui_draw_box(x, y, true);
+
+    return;
+}
+
 
 /**
  * \brief  Tetris模块获得随机数的回调函数
@@ -250,7 +271,7 @@ int main(void)
     __bis_SR_register(GIE);         // 开全局中断
 
     ui_init();
-    tetris_init(&ui_draw_box, &random_num, &get_preview_brick, &get_remove_line_num);
+    tetris_init(&draw_box, &random_num, &get_preview_brick, &get_remove_line_num);
 
     game_pause();
 

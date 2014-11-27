@@ -2,14 +2,14 @@
   ******************************************************************************
   * @file    Tetris.h
   * @author  ykaidong (http://www.DevLabs.cn)
-  * @version V0.1
+  * @version V0.2
   * @date    2014-11-15
   * @brief
   ******************************************************************************
   * Change Logs:
   * Date           Author       Notes
   * 2014-11-15     ykaidong     the first version
-  *
+  * 2014-11-27     ykaidon      更新接口
   ******************************************************************************
   * @attention
   *
@@ -60,15 +60,24 @@ extern void tetris_sync_all(void);
 extern bool tetris_is_game_over(void);
 
 // 初始化, 需要的回调函数说明:
-// draw_box_to_map(uint8_t x, uint8_t y, bool box): 当参数为1时在地图上画一个box
-//                                                  为0时清除掉box.
-// get_random(void): 函数须返回一个随机数, 产生新方块使用
-// next_brick_info(uint16_t info): 当产生新方块后回调此函数, 参数为新方块的数据
-// remove_line_num(uint8_t line): 当发生消行时回调此函数, 参数为消除的行数
-extern void tetris_init(void (*draw_box_to_map)(uint8_t x, uint8_t y, bool box),
-                        uint8_t (*get_random)(void),
-                        void (*next_brick_info)(uint16_t info),
-                        void (*remove_line_num)(uint8_t line));
+// 在(x, y)画一个box, color为颜色, 注意0表示清除, 不表示任何颜色
+// draw_box_to_map(uint8_t x, uint8_t y, uint8_t color)
+
+// 函数须返回一个随机数, 产生新方块使用
+// get_random(void)
+
+// 当产生新方块后回调此函数, 参数为新方块的数据
+// 当前版本 *info 为uint16_t型数据, 代表新方块的点阵数据
+// next_brick_info(const void *info)
+
+// 当发生消行时回调此函数, 参数为消除的行数
+// remove_line_num(uint8_t line)
+extern void tetris_init(
+    void (*draw_box_to_map)(uint8_t x, uint8_t y, uint8_t color),
+    uint8_t (*get_random)(void),
+    void (*next_brick_info)(const void *info),
+    void (*remove_line_num)(uint8_t line)
+    );
 #endif
 
 /************* Copyright(C) 2013 - 2014 DevLabs **********END OF FILE**********/
