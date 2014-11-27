@@ -226,20 +226,20 @@ bool tetris_is_game_over(void)
  */
 static void draw_brick(const brick_t brick)
 {
-    uint8_t i, j;
+    uint8_t box_x, box_y;
 
-    for (i = 0; i < BRICK_HEIGHT; i++)
+    for (box_y = 0; box_y < BRICK_HEIGHT; box_y++)
     {
-        for (j = 0; j < BRICK_WIDTH; j++)
+        for (box_x = 0; box_x < BRICK_WIDTH; box_x++)
         {
             // 保证在地图区域内, 因为SET_BIT()只是一个宏, 对数组边界不会进行检查
             // 所以在这里检查数组(地图)边界是必须的, 但是只要检查上边界就可以
             // 因为如果要调用此函数时已经经过冲突检测, 所以其它条件必然符合
-            if (brick.y + i >= 0
+            if (brick.y + box_y >= 0
                 // && brick.y < TETRIS_MAP_HEIGHT
-                && GET_BIT(brick.brick, 15 - (i * BRICK_WIDTH + j)))
+                && GET_BIT(brick.brick, 15 - (box_y * BRICK_WIDTH + box_x)))
             {
-                SET_BIT(map[i + brick.y], j + brick.x);
+                SET_BIT(map[box_y + brick.y], box_x + brick.x);
             }
         }
     }
@@ -257,18 +257,18 @@ static void draw_brick(const brick_t brick)
  */
 static void clear_brick(const brick_t brick)
 {
-    uint8_t i, j;
+    uint8_t box_x, box_y;
 
-    for (i = 0; i < BRICK_HEIGHT; i++)
+    for (box_y = 0; box_y < BRICK_HEIGHT; box_y++)
     {
-        for (j = 0; j < BRICK_WIDTH; j++)
+        for (box_x = 0; box_x < BRICK_WIDTH; box_x++)
         {
             // 保证在地图区域内
-            if (brick.y + i >= 0
+            if (brick.y + box_y >= 0
                 // && brick.y < TETRIS_MAP_HEIGHT
-                && GET_BIT(brick.brick, 15 - (i * BRICK_WIDTH + j)))
+                && GET_BIT(brick.brick, 15 - (box_y * BRICK_WIDTH + box_x)))
             {
-                CLR_BIT(map[i + brick.y], j + brick.x);
+                CLR_BIT(map[box_y + brick.y], box_x + brick.x);
             }
         }
     }
@@ -287,32 +287,32 @@ static void clear_brick(const brick_t brick)
  */
 static bool is_conflict(const brick_t dest)
 {
-    int8_t column, row;
+    int8_t box_y, box_x;
     bool exp = true;
 
-    for (column = 0; column < BRICK_HEIGHT; column++)
+    for (box_y = 0; box_y < BRICK_HEIGHT; box_y++)
     {
-        for (row = 0; row < BRICK_WIDTH; row++)
+        for (box_x = 0; box_x < BRICK_WIDTH; box_x++)
         {
             // 依次检测每一个box
-            if ((GET_BIT(dest.brick, (15 - (column * BRICK_WIDTH + row)))))
+            if ((GET_BIT(dest.brick, (15 - (box_y * BRICK_WIDTH + box_x)))))
             {
                 // box在地图外的情况(只存在新方块刚被创建时)
                 // 这时不用检测地图部分(因为没在地图内)
                 // 只需要检查左右边界就可以了, 下边界也没必要检查, 因为肯定不会越界
-                if ((dest.y + column) < 0)
+                if ((dest.y + box_y) < 0)
                 {
-                    exp = (((row + dest.x) > (TETRIS_MAP_WIDTH - 1))        // 右边界
-                        || ((row + dest.x) < 0));                           // 左边界
-                        // || ((column + dest.y) > (TETRIS_MAP_HEIGHT - 1)));  // 下边界
+                    exp = (((box_x + dest.x) > (TETRIS_MAP_WIDTH - 1))        // 右边界
+                        || ((box_x + dest.x) < 0));                           // 左边界
+                        // || ((box_y + dest.y) > (TETRIS_MAP_HEIGHT - 1)));  // 下边界
                 }
                 else
                 {
                     // 此时box在地图内, 检查下边界, 还要检测box在地图内是否有冲突
-                    exp = (((row + dest.x) > (TETRIS_MAP_WIDTH - 1))        // 右边界
-                        || ((row + dest.x) < 0)                             // 左边界
-                        || ((column + dest.y) > (TETRIS_MAP_HEIGHT - 1))    // 下边界
-                        || (GET_BIT(map[column + dest.y], (row + dest.x))));// 地图内
+                    exp = (((box_x + dest.x) > (TETRIS_MAP_WIDTH - 1))        // 右边界
+                        || ((box_x + dest.x) < 0)                             // 左边界
+                        || ((box_y + dest.y) > (TETRIS_MAP_HEIGHT - 1))    // 下边界
+                        || (GET_BIT(map[box_y + dest.y], (box_x + dest.x))));// 地图内
                 }
                 if (exp)
                     return true;
@@ -367,7 +367,7 @@ void tetris_init(void (*draw_box_to_map)(uint8_t x, uint8_t y, bool box),
  */
 static void line_clear_check(void)
 {
-    uint8_t i, j, l;
+    uint8_t row, l;
 
     l = 0;
 
@@ -375,14 +375,16 @@ static void line_clear_check(void)
     // 消行, map[0]实际上是地图的顶端
     // 从顶端开始向下扫, 每遇到一行满的
     // 就以此开始替换
-    for (i = 0; i < TETRIS_MAP_HEIGHT; i++)
+    for (row = 0; row < TETRIS_MAP_HEIGHT; row++)
     {
-        if (map[i] >= 0x3FF)
+        if (map[row] >= 0x3FF)
         {
             l++;
-            for (j = i; j > 0; j--)
+
+            uint8_t i;
+            for (i = row; i > 0; i--)
             {
-                map[j] = map[j - 1];
+                map[i] = map[i - 1];
             }
             map[0] = 0;
         }
