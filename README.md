@@ -44,9 +44,9 @@ extern bool tetris_move(dire_t direction);
 extern void tetris_sync(void);
 extern void tetris_sync_all(void);
 extern bool tetris_is_game_over(void);
-extern void tetris_init(void (*draw_box_to_map)(uint8_t x, uint8_t y, bool box),
+extern void tetris_init(void (*draw_box_to_map)(uint8_t x, uint8_t y, uint8_t color),
                         uint8_t (*get_random)(void),
-                        void (*next_brick_info)(uint16_t info),
+                        void (*next_brick_info)(const void *info),
                         void (*remove_line_num)(uint8_t line));
 ```
 
@@ -84,16 +84,22 @@ typedef enum
 模块初始化函数, 需要注册几个必须的回调函数:
 
 1. remove_line_num(uint8_t line)
+
    当产生消行时回调此函数, 参数为消除的行数.
 
-2. draw_box_to_map(uint8_t x, uint8_t y, bool box)
+2. draw_box_to_map(uint8_t x, uint8_t y, uint8_t color)
+
    在地图指定的坐标画一个或清除一个**box**, 取决于第三个参数box的值.
-   *true* 为画一个box, *false* 为清除一个box.
+   color不同的数值表示不同的颜色, 需要注意的是,
+   **参数color的值为0时表示清除掉(x, y)上的box**.
 
 3. get_random(void)
+
    获取一个随机数, 用于产生新方块.
 
-4. next_brick_info(uint16_t info)
+4. next_brick_info(const void *info)
+
+   此版本中 *info 为无符号十六位整数.
    当产生新方块后下一个方块的信息(用于预览)将会回调此函数传回.
    预览方块的信息使用一个无符号16位整数表示, 每4bit一组, 为1的地方表示需要绘制一个box.
    比如有十六进制数 0x0660, 展开二进制分组为:
