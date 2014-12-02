@@ -2,15 +2,15 @@
   ******************************************************************************
   * @file    Tetris.c
   * @author  ykaidong (http://www.DevLabs.cn)
-  * @version V0.2
+  * @version V0.3
   * @date    2014-11-15
   * @brief
   ******************************************************************************
   * Change Logs:
   * Date           Author       Notes
   * 2014-11-15     ykaidong     the first version
-  * 2014-11-27     ykaidon      更新接口
-  *
+  * 2014-11-27     ykaidong     更新接口
+  * 2014-11-28     ykaidong     增加对彩色支持
   ******************************************************************************
   * @attention
   *
@@ -41,6 +41,9 @@ typedef struct
 {
     int8_t x;               //!< brick在地图中的x坐标
     int8_t y;               //!< brick在地图中的y坐标
+#ifdef TETRIS_USE_COLOR
+    int8_t color;           //!< 方块颜色, 0 - 7, 0 表示清除, 非颜色
+#endif
     int8_t index;           //!< 方块索引, 高4位记录类型, 低4位记录变形
     uint16_t brick;         //!< 方块数据
 } brick_t;
@@ -51,6 +54,8 @@ typedef struct
 
 #define BRICK_HEIGHT                4   // 一个brick由4*4的box组成
 #define BRICK_WIDTH                 4
+
+#define BRICK_COLOR                 7   // 一共7种颜色
 
 #define MAP_WIDTH                   10  // 地图宽
 #define MAP_HEIGHT                  20  // 地图高
@@ -66,6 +71,11 @@ typedef struct
 #define     SET_BIT(dat, bit)      ((dat) |= (0x0001 << (bit)))
 #define     CLR_BIT(dat, bit)      ((dat) &= ~(0x0001 << (bit)))
 #define     GET_BIT(dat, bit)      (((dat) & (0x0001 << (bit))) >> (bit))
+
+// 对地图颜色表操作支持宏
+#define     COLOR_TAB_SET(x, y, color)  do{map_color_tab[x][y] = color;}while(0)
+#define     COLOR_TAB_GET(x, y)         map_color_tab[x][y]
+
 
 /* Private variables ---------------------------------------------------------*/
 // 回调函数指针, 用来在坐标(x, y)画一个brick
@@ -132,6 +142,12 @@ static int16_t map[MAP_HEIGHT];
 // 地图备份, 保存上一次的数据, 解决屏幕闪烁问题
 static int16_t map_backup[MAP_HEIGHT];
 
+#ifdef TETRIS_USE_COLOR
+// 地图颜色表
+static uint8_t map_color_tab[MAP_WIDTH][MAP_HEIGHT];
+#endif
+
+
 static brick_t curr_brick;              // 当前方块
 static brick_t next_brick;              // 下一个方块
 
@@ -147,6 +163,13 @@ static brick_t create_new_brick(void)
 {
     brick_t brick;
     uint8_t bt = get_random_num() % BRICK_TYPE;
+
+#ifdef TETRIS_USE_COLOR
+    // 颜色, 0表示清除, 非颜色
+    brick.color = get_random_num() % BRICK_COLOR;
+    if (brick.color == 0)
+        brick.color = 1;
+#endif
 
     // 初始坐标
     brick.x = BRICK_START_X;
@@ -177,7 +200,13 @@ void tetris_sync(void)
             for (x = 0; x < MAP_WIDTH; x++)
             {
                 if (GET_BIT(map[y], x) != GET_BIT(map_backup[y], x))
+                {
+#ifdef TETRIS_USE_COLOR
+                    draw_box(x, y, COLOR_TAB_GET(x, y));
+#else
                     draw_box(x, y, (uint8_t)GET_BIT(map[y], x));
+#endif
+                }
             }
         }
     }
@@ -201,7 +230,11 @@ void tetris_sync_all(void)
     {
         for (x = 0; x < MAP_WIDTH; x++)
         {
+#ifdef TETRIS_USE_COLOR
+            draw_box(x, y, COLOR_TAB_GET(x, y));
+#else
             draw_box(x, y, (uint8_t)GET_BIT(map[y], x));
+#endif
         }
     }
 
@@ -241,6 +274,9 @@ static void draw_brick(const brick_t brick)
                 && GET_BIT(brick.brick, 15 - (box_y * BRICK_WIDTH + box_x)))
             {
                 SET_BIT(map[box_y + brick.y], box_x + brick.x);
+#ifdef TETRIS_USE_COLOR
+                COLOR_TAB_SET(brick.x + box_x, brick.y + box_y, brick.color);
+#endif
             }
         }
     }
@@ -270,6 +306,9 @@ static void clear_brick(const brick_t brick)
                 && GET_BIT(brick.brick, 15 - (box_y * BRICK_WIDTH + box_x)))
             {
                 CLR_BIT(map[box_y + brick.y], box_x + brick.x);
+#ifdef TETRIS_USE_COLOR
+                COLOR_TAB_SET(brick.x + box_x, brick.y + box_y, 0);
+#endif
             }
         }
     }
@@ -355,7 +394,16 @@ void tetris_init(void (*draw_box_to_map)(uint8_t x, uint8_t y, uint8_t color),
 
     // 返回预览方块信息
     if (return_next_brick_info != NULL)
+    {
+#ifdef TETRIS_USE_COLOR
+        // 低16位为方块点阵信息(兼容黑白版本), 高16位的低8位为颜色信息
+        uint32_t brick_info = preview_brick_table[next_brick.index >> 4]
+            + (((uint32_t)next_brick.color) << 16);
+        return_next_brick_info(&brick_info);
+#else
         return_next_brick_info(&preview_brick_table[next_brick.index >> 4]);
+#endif
+    }
 
     draw_brick(curr_brick);
     tetris_sync_all();
@@ -372,7 +420,7 @@ static void line_clear_check(void)
 
     l = 0;
 
-    // FIXME
+    // XXX
     // 消行, map[0]实际上是地图的顶端
     // 从顶端开始向下扫, 每遇到一行满的
     // 就以此开始替换
@@ -386,8 +434,18 @@ static void line_clear_check(void)
             for (i = row; i > 0; i--)
             {
                 map[i] = map[i - 1];
+#ifdef TETRIS_USE_COLOR
+                uint8_t j;
+                for (j = 0; j < MAP_WIDTH; j++)
+                    map_color_tab[j][i] = map_color_tab[j][i - 1];
+#endif
             }
             map[0] = 0;
+#ifdef TETRIS_USE_COLOR
+            uint8_t j;
+            for (j = 0; j < MAP_WIDTH; j++)
+                map_color_tab[j][0] = map_color_tab[j][0];
+#endif
         }
     }
 
@@ -472,7 +530,16 @@ bool tetris_move(dire_t direction)
             next_brick = create_new_brick();
             // 预览方块信息
             if (return_next_brick_info != NULL)
+            {
+#ifdef TETRIS_USE_COLOR
+                // 低16位为方块点阵信息(兼容黑白版本), 高16位的低8位为颜色信息
+                uint32_t brick_info = preview_brick_table[next_brick.index >> 4]
+                    + (((uint32_t)next_brick.color) << 16);
+                return_next_brick_info(&brick_info);
+#else
                 return_next_brick_info(&preview_brick_table[next_brick.index >> 4]);
+#endif
+            }
         }
         is_move = false;
     }

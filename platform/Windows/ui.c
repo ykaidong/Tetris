@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file    ui.c
   * @author  ykaidong (http://www.DevLabs.cn)
-  * @version V0.2
+  * @version V0.3
   * @date    2014-11-15
   * @brief   俄罗斯方块界面相关函数.
   * @note    俄罗斯方块的基本元素是一组由4个小型正方形组成的规则图形，
@@ -17,6 +17,7 @@
   * Date           Author       Notes
   * 2014-11-15     ykaidong     the first version
   * 2014-11-23     ykaidong     将画box的函数独立出来
+  * 2014-11-30     ykaidong     支持彩色
   ******************************************************************************
   * @attention
   *
@@ -52,6 +53,9 @@
 #define     PREVIEW_START_COLUMN    28
 #define     PREVIEW_START_ROW       3
 
+#define     UI_COLOR_BASE           8       //!< 亮色, 参考pcc32.h
+#define     UI_BG_COLOR             WHITE   //!< 地图背景色, 非控制台背景
+
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
@@ -62,16 +66,29 @@
  *
  * \param  x
  * \param  y
- * \param  box true 画box, false 清除box
+ * \param  color 颜色, 0 - 7. 注意0表示清除该box, 非颜色
  */
-static void draw_box(uint8_t x, uint8_t y, bool box)
+static void draw_box(uint8_t x, uint8_t y, uint8_t color)
 {
     gotoTextPos(x, y);
 
-    if (!box)
+    // 清除
+    if (!color)
+    {
+        setTextColor(UI_BG_COLOR);
         printf("□");
+    }
     else
+    {
+#ifdef UI_USE_COLOR
+        // 从UI_COLOR_BASE起是亮色
+        setTextColor(color + UI_COLOR_BASE);
+#else
+        // 单色模式下, 设前景为白色
+        setTextColor(WHITE);
+#endif
         printf("■");
+    }
 
     return;
 }
@@ -83,10 +100,10 @@ static void draw_box(uint8_t x, uint8_t y, bool box)
  * \param  x 地图区: 0 - 9
  * \param  y 地图区: 0 - 19
  */
-void ui_draw_box(uint8_t x, uint8_t y, bool box)
+void ui_draw_box(uint8_t x, uint8_t y, uint8_t color)
 {
     // 横向全角的一个方块符号占用两个字符位置
-    draw_box(x * 2 + MAP_START_COLUMN, y + MAP_START_ROW, box);
+    draw_box(x * 2 + MAP_START_COLUMN, y + MAP_START_ROW, color);
 
     return;
 }
@@ -101,6 +118,7 @@ void ui_draw_box(uint8_t x, uint8_t y, bool box)
 void ui_print_score(uint32_t score)
 {
     gotoTextPos(33, 16);
+    setTextColor(WHITE);
     printf("%4d", score);
 
     return;
@@ -115,6 +133,7 @@ void ui_print_score(uint32_t score)
 void ui_print_level(uint8_t level)
 {
     gotoTextPos(33, 10);
+    setTextColor(WHITE);
     printf("%4d", level);
 
     return;
@@ -129,6 +148,7 @@ void ui_print_level(uint8_t level)
 void ui_print_line(uint16_t line)
 {
     gotoTextPos(33, 13);
+    setTextColor(WHITE);
     printf("%4d", line);
 
     return;
@@ -140,6 +160,7 @@ void ui_print_line(uint16_t line)
  */
 void ui_print_game_over(void)
 {
+    setTextColor(WHITE);
     gotoTextPos(4, 9);
     printf("                ");
     gotoTextPos(4, 10);
@@ -156,10 +177,23 @@ void ui_print_game_over(void)
  *
  * \param  brick
  */
-void ui_print_preview(uint16_t brick)
+void ui_print_preview(const void *info)
 {
-    uint8_t x, y;
     bool bit;
+    uint8_t x, y;
+    uint16_t brick;
+
+    const uint8_t *p_info = info;
+    // 取得方块数据
+    brick = (*(uint16_t *)p_info);
+
+#ifdef UI_USE_COLOR
+    uint8_t color;
+    // ASCII C 中不允许对 void 型指针进行运算
+    p_info += 2;
+    // 得到颜色值
+    color = (*(uint8_t *)p_info);
+#endif
 
     for (y = 0; y < 4; y++)
     {
@@ -167,7 +201,14 @@ void ui_print_preview(uint16_t brick)
         {
             bit = ((brick & (0x0001 << (15 - (y * 4 + x)))) >> (15 - (y * 4 + x)));
             // 横向全角的一个方块符号占用两个字符位置
+#ifdef UI_USE_COLOR
+            if (bit)
+                draw_box(x * 2 + PREVIEW_START_COLUMN, y + PREVIEW_START_ROW, color);
+            else
+                draw_box(x * 2 + PREVIEW_START_COLUMN, y + PREVIEW_START_ROW, 0);
+#else
             draw_box(x * 2 + PREVIEW_START_COLUMN, y + PREVIEW_START_ROW, bit);
+#endif
         }
     }
 
@@ -182,6 +223,7 @@ void ui_print_preview(uint16_t brick)
  */
 void ui_print_game_pause(void)
 {
+    setTextColor(WHITE);
     gotoTextPos(4, 8);
     printf("                ");
     gotoTextPos(4, 9);
@@ -204,6 +246,7 @@ void ui_init(void)
     setCursorVisible(0);
     setConsoleTitle("Tetris by DevLabs");
 
+    setTextColor(WHITE);
     gotoTextPos(0, 0);
 
     printf("┏━━━━━━━━━━┓              \n");
@@ -232,7 +275,10 @@ void ui_init(void)
     ui_print_line(0);
     ui_print_level(1);
     ui_print_score(0);
-    ui_print_preview(0x0000);
+
+    // 预览方块信息
+    uint32_t temp = 0;
+    ui_print_preview(&temp);
 
     return;
 }

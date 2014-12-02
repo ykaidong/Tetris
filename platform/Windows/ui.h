@@ -2,14 +2,14 @@
   ******************************************************************************
   * @file    ui.h
   * @author  ykaidong (http://www.DevLabs.cn)
-  * @version V0.1
+  * @version V0.2
   * @date    2014-11-15
   * @brief
   ******************************************************************************
   * Change Logs:
   * Date           Author       Notes
   * 2014-11-15     ykaidong     the first version
-  *
+  * 2014-11-30     ykaidong     支持彩色
   ******************************************************************************
   * @attention
   *
@@ -47,8 +47,8 @@
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
 extern void ui_init(void);
-extern void ui_draw_box(uint8_t x, uint8_t y, bool box);
-extern void ui_print_preview(uint16_t block);
+extern void ui_draw_box(uint8_t x, uint8_t y, uint8_t color);
+extern void ui_print_preview(const void *info);
 extern void ui_print_level(uint8_t level);
 extern void ui_print_line(uint16_t line);
 extern void ui_print_score(uint32_t score);

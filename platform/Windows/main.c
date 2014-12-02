@@ -72,6 +72,7 @@ void game_info_update(void)
     return;
 }
 
+#if 0
 
 /**
  * \brief  返回预览方块(下一个方块)的信息
@@ -82,12 +83,12 @@ void game_info_update(void)
  */
 void get_preview_brick(const void *info)
 {
-    uint16_t dat = *((uint16_t *)info);
-
-    ui_print_preview(dat);
+    ui_print_preview(info);
 
     return;
 }
+
+#endif
 
 
 /**
@@ -99,10 +100,7 @@ void get_preview_brick(const void *info)
  */
 void draw_box(uint8_t x, uint8_t y, uint8_t color)
 {
-    if (color == 0)
-        ui_draw_box(x, y, false);
-    else
-        ui_draw_box(x, y, true);
+    ui_draw_box(x, y, color);
 
     return;
 }
@@ -242,7 +240,8 @@ int main(void)
     srand((int32_t)time(NULL));
 
     ui_init();
-    tetris_init(&draw_box, &random_num, &get_preview_brick, &get_remove_line_num);
+    // tetris_init(&draw_box, &random_num, &get_preview_brick, &get_remove_line_num);
+    tetris_init(&ui_draw_box, &random_num, &ui_print_preview, &get_remove_line_num);
 
     game_pause();
 

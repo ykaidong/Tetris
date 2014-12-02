@@ -13,29 +13,29 @@
       <file>$PROJ_DIR$\..\term.c</file>
       <file>$PROJ_DIR$\..\..\..\src\Tetris.c</file>
       <file>$PROJ_DIR$\..\uart.c</file>
-      <file>$TOOLKIT_DIR$\inc\dlib\c\xencoding_limits.h</file>
       <file>$PROJ_DIR$\Debug\Obj\main.pbi</file>
       <file>$PROJ_DIR$\main.c</file>
-      <file>$TOOLKIT_DIR$\inc\intrinsics.h</file>
-      <file>$TOOLKIT_DIR$\inc\dlib\c\stdint.h</file>
-      <file>$TOOLKIT_DIR$\inc\dlib\c\yvals.h</file>
-      <file>$TOOLKIT_DIR$\lib\dlib\dl430fn.h</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\c\xencoding_limits.h</file>
       <file>$PROJ_DIR$\Debug\Obj\Tetris.pbd</file>
-      <file>$PROJ_DIR$\Debug\Exe\Tetris.ulp</file>
       <file>$PROJ_DIR$\Debug\Obj\main.r43</file>
+      <file>$PROJ_DIR$\Debug\Exe\Tetris.ulp</file>
+      <file>$TOOLKIT_DIR$\lib\dlib\dl430fn.h</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\c\yvals.h</file>
+      <file>$TOOLKIT_DIR$\inc\dlib\c\stdint.h</file>
+      <file>$TOOLKIT_DIR$\inc\intrinsics.h</file>
       <file>$PROJ_DIR$\Debug\Obj\term.r43</file>
       <file>$PROJ_DIR$\Debug\Obj\term.pbi</file>
       <file>$TOOLKIT_DIR$\inc\dlib\c\DLib_Product.h</file>
       <file>$TOOLKIT_DIR$\inc\dlib\c\DLib_Threads.h</file>
+      <file>$TOOLKIT_DIR$\inc\msp430g2553.h</file>
       <file>$PROJ_DIR$\..\..\..\src\Tetris.h</file>
       <file>$PROJ_DIR$\Debug\Exe\Tetris.d43</file>
-      <file>$TOOLKIT_DIR$\inc\msp430g2553.h</file>
       <file>$TOOLKIT_DIR$\lib\dlib\dl430fn.r43</file>
-      <file>$PROJ_DIR$\Debug\Obj\ui.pbi</file>
-      <file>$TOOLKIT_DIR$\inc\msp430.h</file>
-      <file>$PROJ_DIR$\Debug\Obj\ui.r43</file>
-      <file>$TOOLKIT_DIR$\config\lnk430G2553.xcl</file>
       <file>$TOOLKIT_DIR$\inc\dlib\c\stdbool.h</file>
+      <file>$TOOLKIT_DIR$\inc\msp430.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\ui.pbi</file>
+      <file>$TOOLKIT_DIR$\config\lnk430G2553.xcl</file>
+      <file>$PROJ_DIR$\Debug\Obj\ui.r43</file>
       <file>$TOOLKIT_DIR$\inc\dlib\c\ycheck.h</file>
       <file>$TOOLKIT_DIR$\inc\dlib\c\DLib_Defaults.h</file>
       <file>$TOOLKIT_DIR$\inc\in430.h</file>
@@ -60,22 +60,22 @@
       <name>$PROJ_DIR$\..\key.c</name>
       <outputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 41</file>
-        </tool>
-        <tool>
           <name>ICC430</name>
           <file> 43</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 41</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 42 11 30 12 31 13 19 7 20 29 37 26 23 32 10</file>
+          <name>ICC430</name>
+          <file> 42 15 30 14 31 13 19 9 20 25 37 26 21 32 16</file>
         </tool>
         <tool>
-          <name>ICC430</name>
-          <file> 42 11 30 12 31 13 19 7 20 29 37 26 23 32 10</file>
+          <name>BICOMP</name>
+          <file> 42 15 30 14 31 13 19 9 20 25 37 26 21 32 16</file>
         </tool>
       </inputs>
     </file>
@@ -83,22 +83,22 @@
       <name>$PROJ_DIR$\..\fifo.c</name>
       <outputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 38</file>
-        </tool>
-        <tool>
           <name>ICC430</name>
           <file> 34</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 38</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 40 30 12 31 13 19 7 20 39 35 11 29</file>
+          <name>ICC430</name>
+          <file> 40 30 14 31 13 19 9 20 39 35 15 25</file>
         </tool>
         <tool>
-          <name>ICC430</name>
-          <file> 40 30 12 31 13 19 7 20 39 35 11 29</file>
+          <name>BICOMP</name>
+          <file> 40 30 14 31 13 19 9 20 39 35 15 25</file>
         </tool>
       </inputs>
     </file>
@@ -106,22 +106,22 @@
       <name>$PROJ_DIR$\..\main.c</name>
       <outputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 8</file>
+          <name>ICC430</name>
+          <file> 11</file>
         </tool>
         <tool>
-          <name>ICC430</name>
-          <file> 16</file>
+          <name>BICOMP</name>
+          <file> 7</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 26 23 32 10 29 11 30 12 31 13 19 7 20 45 37 42 44 48</file>
+          <name>ICC430</name>
+          <file> 26 21 32 16 25 15 30 14 31 13 19 9 20 22 37 42 44 48</file>
         </tool>
         <tool>
-          <name>ICC430</name>
-          <file> 26 23 32 10 29 11 30 12 31 13 19 7 20 21 37 42 44 48</file>
+          <name>BICOMP</name>
+          <file> 26 21 32 16 25 15 30 14 31 13 19 9 20 45 37 42 44 48</file>
         </tool>
       </inputs>
     </file>
@@ -129,22 +129,18 @@
       <name>$PROJ_DIR$\..\ui.c</name>
       <outputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 25</file>
+          <name>ICC430</name>
+          <file> 29</file>
         </tool>
         <tool>
-          <name>ICC430</name>
+          <name>BICOMP</name>
           <file> 27</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 44 29 11 30 12 31 13 19 7 20 48 37 26 23 32 10</file>
-        </tool>
-        <tool>
           <name>ICC430</name>
-          <file> 44 29 11 30 12 31 13 19 7 20 48 37 26 23 32 10</file>
+          <file> 44 25 15 30 14 31 13 19 9 20 48 37 26 21 32 16</file>
         </tool>
       </inputs>
     </file>
@@ -152,22 +148,22 @@
       <name>$PROJ_DIR$\..\term.c</name>
       <outputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 18</file>
-        </tool>
-        <tool>
           <name>ICC430</name>
           <file> 17</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 18</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 40 30 12 31 13 19 7 20 39 48 29 11 37 26 23 32 10</file>
+          <name>ICC430</name>
+          <file> 40 30 14 31 13 19 9 20 39 48 25 15 37 26 21 32 16</file>
         </tool>
         <tool>
-          <name>ICC430</name>
-          <file> 40 30 12 31 13 19 7 20 39 48 29 11 37 26 23 32 10</file>
+          <name>BICOMP</name>
+          <file> 40 30 14 31 13 19 9 20 39 48 25 15 37 26 21 32 16</file>
         </tool>
       </inputs>
     </file>
@@ -175,22 +171,22 @@
       <name>$PROJ_DIR$\..\..\..\src\Tetris.c</name>
       <outputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 47</file>
-        </tool>
-        <tool>
           <name>ICC430</name>
           <file> 46</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 47</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 21 11 30 12 31 13 19 7 20 29</file>
+          <name>ICC430</name>
+          <file> 22 15 30 14 31 13 19 9 20 25</file>
         </tool>
         <tool>
-          <name>ICC430</name>
-          <file> 21 11 30 12 31 13 19 7 20 29</file>
+          <name>BICOMP</name>
+          <file> 22 15 30 14 31 13 19 9 20 25</file>
         </tool>
       </inputs>
     </file>
@@ -198,22 +194,22 @@
       <name>$PROJ_DIR$\..\uart.c</name>
       <outputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 36</file>
-        </tool>
-        <tool>
           <name>ICC430</name>
           <file> 33</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 36</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 40 30 12 31 13 19 7 20 39 37 26 23 32 10 11 29 35</file>
+          <name>ICC430</name>
+          <file> 40 30 14 31 13 19 9 20 39 37 26 21 32 16 15 25 35</file>
         </tool>
         <tool>
-          <name>ICC430</name>
-          <file> 40 30 12 31 13 19 7 20 39 37 26 23 32 10 11 29 35</file>
+          <name>BICOMP</name>
+          <file> 40 30 14 31 13 19 9 20 39 37 26 21 32 16 15 25 35</file>
         </tool>
       </inputs>
     </file>
@@ -221,18 +217,27 @@
       <name>$PROJ_DIR$\main.c</name>
       <outputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 8</file>
+          <name>ICC430</name>
+          <file> 11</file>
         </tool>
         <tool>
-          <name>ICC430</name>
-          <file> 16</file>
+          <name>BICOMP</name>
+          <file> 7</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
           <name>ICC430</name>
-          <file> 26 23 32 10 29 11 30 12 31 13 19 7 20</file>
+          <file> 26 21 32 16 25 15 30 14 31 13 19 9 20</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\Debug\Exe\Tetris.d43</name>
+      <inputs>
+        <tool>
+          <name>XLINK</name>
+          <file> 28 46 34 43 11 17 33 29 24</file>
         </tool>
       </inputs>
     </file>
@@ -241,22 +246,13 @@
       <outputs>
         <tool>
           <name>XLINK</name>
-          <file> 22</file>
+          <file> 23</file>
         </tool>
         <tool>
           <name>ULP430</name>
-          <file> 15</file>
+          <file> 12</file>
         </tool>
       </outputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\Debug\Exe\Tetris.d43</name>
-      <inputs>
-        <tool>
-          <name>XLINK</name>
-          <file> 28 46 34 43 16 17 33 27 24</file>
-        </tool>
-      </inputs>
     </file>
   </configuration>
   <configuration>
