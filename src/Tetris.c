@@ -200,13 +200,11 @@ void tetris_sync(void)
             for (x = 0; x < MAP_WIDTH; x++)
             {
                 if (GET_BIT(map[y], x) != GET_BIT(map_backup[y], x))
-                {
 #ifdef TETRIS_USE_COLOR
                     draw_box(x, y, COLOR_TAB_GET(x, y));
 #else
                     draw_box(x, y, (uint8_t)GET_BIT(map[y], x));
 #endif
-                }
             }
         }
     }
