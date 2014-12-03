@@ -450,8 +450,15 @@ static void line_clear_check(void)
     }
 
     // 有消行, 返回消行数
-    if (return_remove_line_num != NULL)
-        return_remove_line_num(l);
+    if (l != 0)
+    {
+        if (return_remove_line_num != NULL)
+            return_remove_line_num(l);
+#ifdef TETRIS_USE_COLOR
+        // 需要刷新全部, 否则颜色显示可能不对
+        tetris_sync_all();
+#endif
+    }
 
     return;
 }
