@@ -3,6 +3,10 @@ Tetris
 
 一个简单易用的俄罗斯方块模块
 
+2014-12-4: 增加了彩色模式, 在Windows下可使用宏 TETRIS_USE_COLOR 和 UI_USE_COLOR 可开启, 见builder.bat.
+资源消耗: 单色模式下不到80字节(静态变量), 彩色模式下多增加280字节左右, 可进一步优化. 
+
+
 在Windows控制台上运行:
 
 ![Tetris](./Tetris.gif)
