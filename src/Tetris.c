@@ -35,6 +35,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "tetris.h"
+#include <string.h>     // memset()
 
 /* Private typedef -----------------------------------------------------------*/
 typedef struct
@@ -73,9 +74,8 @@ typedef struct
 #define     GET_BIT(dat, bit)      (((dat) & (0x0001 << (bit))) >> (bit))
 
 // 对地图颜色表操作支持宏
-#define     COLOR_TAB_SET(x, y, color)  do{map_color_tab[x][y] = color;}while(0)
-#define     COLOR_TAB_GET(x, y)         map_color_tab[x][y]
-
+#define     COLOR_TAB_SET(x, y, color)  do{map_color_tab_index[y][x] = color;}while(0)
+#define     COLOR_TAB_GET(x, y)         map_color_tab_index[y][x]
 
 /* Private variables ---------------------------------------------------------*/
 // 回调函数指针, 用来在坐标(x, y)画一个brick
@@ -143,8 +143,10 @@ static int16_t map[MAP_HEIGHT];
 static int16_t map_backup[MAP_HEIGHT];
 
 #ifdef TETRIS_USE_COLOR
-// 地图颜色表
-static uint8_t map_color_tab[MAP_WIDTH][MAP_HEIGHT];
+// 地图颜色表, 注意第一维是y
+static uint8_t map_color_tab[MAP_HEIGHT][MAP_WIDTH];
+// 此数组保存指向地图颜色表中每一行的指针
+static uint8_t *map_color_tab_index[MAP_HEIGHT];
 #endif
 
 
@@ -385,7 +387,12 @@ void tetris_init(void (*draw_box_to_map)(uint8_t x, uint8_t y, uint8_t color),
 
     // 初始化地图
     for (i = 0; i < MAP_HEIGHT; i++)
+    {
         map[i] = 0;
+#ifdef TETRIS_USE_COLOR
+        map_color_tab_index[i] = map_color_tab[i];
+#endif
+    }
 
     curr_brick = create_new_brick();
     next_brick = create_new_brick();
@@ -429,20 +436,20 @@ static void line_clear_check(void)
             l++;
 
             uint8_t i;
+#ifdef  TETRIS_USE_COLOR
+            uint8_t *py = map_color_tab_index[row];
+#endif
             for (i = row; i > 0; i--)
             {
                 map[i] = map[i - 1];
 #ifdef TETRIS_USE_COLOR
-                uint8_t j;
-                for (j = 0; j < MAP_WIDTH; j++)
-                    map_color_tab[j][i] = map_color_tab[j][i - 1];
+                map_color_tab_index[i] = map_color_tab_index[i - 1];
 #endif
             }
             map[0] = 0;
 #ifdef TETRIS_USE_COLOR
-            uint8_t j;
-            for (j = 0; j < MAP_WIDTH; j++)
-                map_color_tab[j][0] = map_color_tab[j][0];
+            memset(py, 0, MAP_WIDTH);
+            map_color_tab_index[0] = py;
 #endif
         }
     }
