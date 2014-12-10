@@ -141,7 +141,10 @@ uint8_t random_num(void)
  */
 void get_remove_line_num(uint8_t line)
 {
+    static uint16_t count;
+
     lines += line;
+    count++;
 
     switch (line)
     {
@@ -161,8 +164,8 @@ void get_remove_line_num(uint8_t line)
         break;
     }
 
-    // 每25行升一级
-    level = lines / 25 + 1;
+    // 每消行20次升一级
+    level = lines / 20 + 1;
 
     return;
 }
